@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+
+    # Backend API  
+    face_detection_api:
+      container_name: backend
+      build: ./
+      command: npm start
+      # command: nodemon -L server.js
+      working_dir: /usr/src/face_recognition_api
+      environment:
+        POSTGRES_URI: postgres://sally:secret@postgres:5432/face_detection_docker
+        REDIS_URI: redis://redis:6379
+      links:
+        - postgres
+        - redis
+      ports:
+        - "3000:3000"
+      volumes:
+        - ./:/usr/src/face_recognition_api
+
+    # Postgres
+    postgres:
+      environment:
+        POSTGRES_USER: sally
+        POSTGRES_PASSWORD: secret
+        POSTGRES_DB: face_detection_docker
+        POSTGRES_HOST: postgres
+      container_name: postgres
+      build: ./postgres
+      ports:
+        - "5431:5432"
+
+    # Redis
+    redis:
+      image: redis
+      ports:
+        - "6379:6379"
